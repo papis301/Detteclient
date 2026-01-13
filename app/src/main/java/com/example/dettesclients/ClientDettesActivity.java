@@ -41,6 +41,9 @@ public class ClientDettesActivity extends AppCompatActivity {
 
         detteDao = new DetteDao(this);
 
+        TextView txtClientNom = findViewById(R.id.txtClientNom);
+        txtClientNom.setText(clientNom);
+
         findViewById(R.id.btnAddDette).setOnClickListener(v -> showAddDetteDialog());
 
         loadDettes();
