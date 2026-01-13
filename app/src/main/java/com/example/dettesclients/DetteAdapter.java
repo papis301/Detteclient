@@ -15,6 +15,16 @@ import java.util.List;
 public class DetteAdapter extends RecyclerView.Adapter<DetteAdapter.DetteViewHolder> {
 
     private List<Dette> dettes;
+    public interface OnDetteActionListener {
+        void onDetteLongClick(Dette dette);
+    }
+
+    private OnDetteActionListener listener;
+
+    public DetteAdapter(List<Dette> dettes, OnDetteActionListener listener) {
+        this.dettes = dettes;
+        this.listener = listener;
+    }
 
     public DetteAdapter(List<Dette> dettes) {
         this.dettes = dettes;
@@ -35,6 +45,15 @@ public class DetteAdapter extends RecyclerView.Adapter<DetteAdapter.DetteViewHol
         holder.txtMontant.setText("Montant : " + d.getMontant());
         holder.txtDesc.setText(d.getDescription());
         holder.txtDate.setText(d.getDate());
+
+        // Afficher visuellement si payée
+        holder.itemView.setBackgroundColor(d.isPaye() ? 0xFFDFF0D8 : 0xFFFFFFFF);
+
+        // Clic long pour modifier ou marquer payée
+        holder.itemView.setOnLongClickListener(v -> {
+            if (listener != null) listener.onDetteLongClick(d);
+            return true;
+        });
     }
 
     @Override
