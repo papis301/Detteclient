@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.color.DynamicColors;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,31 +22,35 @@ public class ClientDettesActivity extends AppCompatActivity {
 
     private int clientId;
     private String clientNom;
+
     private DetteDao detteDao;
     private RecyclerView recycler;
-    private TextView txtTotal;
+    private TextView txtTotal, txtClientNom;
     private DetteAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // 🚫 Désactiver Material You
+        DynamicColors.applyToActivitiesIfAvailable(
+                getApplication()
+        );
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_dettes);
 
         clientId = getIntent().getIntExtra("client_id", -1);
         clientNom = getIntent().getStringExtra("client_nom");
 
-        setTitle("Dettes de " + clientNom);
-
         recycler = findViewById(R.id.recyclerDettes);
         recycler.setLayoutManager(new LinearLayoutManager(this));
+
         txtTotal = findViewById(R.id.txtTotal);
-
-        detteDao = new DetteDao(this);
-
-        TextView txtClientNom = findViewById(R.id.txtClientNom);
+        txtClientNom = findViewById(R.id.txtClientNom);
         txtClientNom.setText(clientNom);
 
-        findViewById(R.id.btnAddDette).setOnClickListener(v -> showAddDetteDialog());
+        FloatingActionButton fab = findViewById(R.id.fabAddDette);
+        fab.setOnClickListener(v -> showAddDetteDialog());
+
+        detteDao = new DetteDao(this);
 
         loadDettes();
     }
@@ -52,13 +58,28 @@ public class ClientDettesActivity extends AppCompatActivity {
     private void loadDettes() {
         List<Dette> list = detteDao.getByClient(clientId);
 
-        adapter = new DetteAdapter(list, dette -> showEditDetteDialog(dette));
+        adapter = new DetteAdapter(this, list, new DetteAdapter.OnDetteActionListener() {
+
+            @Override
+            public void onMarquerPaye(Dette dette) {
+                dette.setPaye(true);
+                detteDao.update(dette);
+                loadDettes();
+            }
+
+            @Override
+            public void onLongClick(Dette dette) {
+                showEditDetteDialog(dette);
+            }
+        });
+
         recycler.setAdapter(adapter);
 
         double total = detteDao.totalByClient(clientId);
-        txtTotal.setText("Total Restant: " + total);
+        txtTotal.setText("Total restant : " + total + " FCFA");
     }
 
+    // ==================== AJOUT ====================
     private void showAddDetteDialog() {
         View view = getLayoutInflater().inflate(R.layout.dialog_add_dette, null);
 
@@ -78,7 +99,9 @@ public class ClientDettesActivity extends AppCompatActivity {
                     }
 
                     String desc = edtDesc.getText().toString().trim();
-                    String date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+                    String date = new SimpleDateFormat(
+                            "dd/MM/yyyy", Locale.getDefault()
+                    ).format(new Date());
 
                     Dette d = new Dette(clientId, montant, desc, date);
                     detteDao.insert(d);
@@ -88,6 +111,7 @@ public class ClientDettesActivity extends AppCompatActivity {
                 .show();
     }
 
+    // ==================== MODIFICATION ====================
     private void showEditDetteDialog(Dette d) {
         View view = getLayoutInflater().inflate(R.layout.dialog_add_dette, null);
 
@@ -98,7 +122,7 @@ public class ClientDettesActivity extends AppCompatActivity {
         edtDesc.setText(d.getDescription());
 
         new AlertDialog.Builder(this)
-                .setTitle("Modifier dette")
+                .setTitle("Modifier la dette")
                 .setView(view)
                 .setPositiveButton("Enregistrer", (dialog, which) -> {
                     try {
@@ -111,11 +135,13 @@ public class ClientDettesActivity extends AppCompatActivity {
                     detteDao.update(d);
                     loadDettes();
                 })
-                .setNeutralButton(d.isPaye() ? "Marquer non payée" : "Marquer payée", (dialog, which) -> {
-                    d.setPaye(!d.isPaye());
-                    detteDao.update(d);
-                    loadDettes();
-                })
+                .setNeutralButton(
+                        d.isPaye() ? "Marquer non payée" : "Marquer payée",
+                        (dialog, which) -> {
+                            d.setPaye(!d.isPaye());
+                            detteDao.update(d);
+                            loadDettes();
+                        })
                 .setNegativeButton("Annuler", null)
                 .show();
     }

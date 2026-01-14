@@ -1,33 +1,66 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="10dp"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Nom du client -->
-    <TextView
-        android:id="@+id/txtClientNom"
-        android:textSize="20sp"
-        android:textStyle="bold"
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Carte client -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="6dp"
+            app:shapeAppearanceOverlay="@style/RoundedCard">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txtClientNom"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:text="Client"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txtTotal"
+                    android:textSize="18sp"
+                    android:textColor="@color/md_theme_error"
+                    android:layout_marginTop="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Liste des dettes -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerDettes"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <!-- FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddDette"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nom du client"/>
+        android:contentDescription="Ajouter dette"
+        android:src="@drawable/ic_add"
+        app:layout_anchorGravity="bottom|end"
+        android:layout_margin="16dp"
+        app:layout_anchor="@id/recyclerDettes"/>
 
-    <TextView
-        android:id="@+id/txtTotal"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <Button
-        android:id="@+id/btnAddDette"
-        android:text="Ajouter dette"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerDettes"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.color.DynamicColors;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -24,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // 🚫 Désactiver Material You
+        DynamicColors.applyToActivitiesIfAvailable(
+                getApplication()
+        );
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -32,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerClients);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        Button btnAdd = findViewById(R.id.btnAdd);
-        btnAdd.setOnClickListener(v -> showAddClientDialog());
+        FloatingActionButton fab = findViewById(R.id.fabAddClient);
+        fab.setOnClickListener(v -> showAddClientDialog());
 
         loadClients();
     }
